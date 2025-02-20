@@ -15,16 +15,38 @@ std::string convToLower(std::string src)
     to a set of words based on the criteria given in the assignment **/
 std::set<std::string> parseStringToWords(string rawWords)
 {
-
-
-
-
-
-
-
-
-
-
+    std::set<std::string> words;
+    // get rid of whitespace on the ends of the string
+    rawWords = trim(rawWords);
+    std::string tempWord;
+    int indexStart = 0;
+    int indexEnd = 0;
+    // parses through string until we reach the end of it
+    while (indexEnd < rawWords.length()){
+        // checks each character of string to see if punctuation OR a space,
+        if (ispunct(rawWords[indexEnd]) || rawWords[indexEnd] == ' '){
+            // substring of current stard index up until the current end index to get characters up to most recent space/ punct
+            std::string subStrTemp = rawWords.substr(indexStart, indexEnd - indexStart);
+            // trim off excess spaces on the side
+            subStrTemp = trim(subStrTemp);
+            // only considers word as valid if it is at least length 2
+            if (subStrTemp.length() >= 2){
+                // converts to lower to it's all the same, add to keywords set
+                words.insert(convToLower(subStrTemp));
+            }
+            // adjust indexes as necessary to move to the next part of the string
+            indexStart = indexEnd + 1;
+        } 
+        indexEnd++;
+    }
+    // sanity check, in case there happens to be anything at the end not parsed through by the above loop, adds to set if relevant
+    // shouldn't be called
+    std::string subStrTempEnd = rawWords.substr(indexStart);
+    subStrTempEnd = trim(subStrTempEnd);
+    if (subStrTempEnd.length() >= 2){
+        words.insert(convToLower(subStrTempEnd));
+    }
+    return words;
 }
 
 /**************************************************

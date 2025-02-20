@@ -9,6 +9,7 @@
 #include "db_parser.h"
 #include "product_parser.h"
 #include "util.h"
+#include "mydatastore.h"
 
 using namespace std;
 struct ProdNameSorter {
@@ -29,7 +30,7 @@ int main(int argc, char* argv[])
      * Declare your derived DataStore object here replacing
      *  DataStore type to your derived type
      ****************/
-    DataStore ds;
+    MyDataStore ds;
 
 
 
@@ -100,15 +101,61 @@ int main(int argc, char* argv[])
                 done = true;
             }
 	    /* Add support for other commands here */
-
-
-
-
+            else if ( cmd == "ADD" ) {
+                string username;
+                string result_index;
+                // gets username and hot_result_index from CL argument 
+                if ((ss >> username)){
+                    if (ss >> result_index){
+                        std::set<std::string> userNames = ds.getUsers();
+                        // checks username is valid (in use) and hit_result_index refers to an actual number 
+                        if (userNames.find(username) != userNames.end() && std::stoi(result_index) > 0 && std::stoi(result_index) <= hits.size()){
+                            ds.addCart(username, hits[std::stoi(result_index) - 1]);
+                        } else {
+                            cout << "Invalid request" << endl;
+                        }
+                    }
+                }
+                else {
+                    cout << "Invalid request" << endl;
+                }
+            }
+            else if ( cmd == "VIEWCART" ) {
+                string username;
+                // gets username from CL argument
+                if ((ss >> username)){
+                    std::set<std::string> userNames = ds.getUsers();
+                    // calls function to print out cart if username is valid
+                    if (userNames.find(username) != userNames.end()){
+                        ds.viewCart(username);
+                    } else {
+                        cout << "Invalid username" << endl;
+                    }
+                }
+                else {
+                    cout << "Invalid username" << endl;
+                }
+            }
+            else if ( cmd == "BUYCART" ) {
+                string username;
+                // gets username from CL argument
+                if ((ss >> username)){
+                    std::set<std::string> userNames = ds.getUsers();
+                    if (userNames.find(username) != userNames.end()){
+                        // checks if can buy
+                        ds.buyCart(username);
+                    } else {
+                        cout << "Invalid username" << endl;
+                    }
+                }
+                else {
+                    cout << "Invalid username" << endl;
+                }
+            }
             else {
                 cout << "Unknown command" << endl;
             }
         }
-
     }
     return 0;
 }
